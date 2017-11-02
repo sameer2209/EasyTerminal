@@ -84,8 +84,9 @@ char* getCommandInput(){
   }
   printf("no of command tokens: %d\n", no_of_command_tokens);
   printf("input string is: %s\n", inputCommandString);
-  free(tempInputString);
-  return inputCommandString;
+  //free(tempInputString);
+  //free(inputCommandString);
+  return tempInputString;
   //return tempInputString;
 }
 
@@ -216,7 +217,7 @@ void execGoCommand(){
     }
   }
 
-  displayCurrentDirectory();
+  //displayCurrentDirectory();
 
   // char command[50];
   // if(no_of_command_tokens == 2){
@@ -321,9 +322,63 @@ void execDeleteCommand(){
 
 void execCopyCommand(){
 
+  pid_t pid;
+  pid = fork();
+  if(pid == 0){
+    //printf("inside fork");
+    char command[200];
+    char source[100];
+    char destination[100];
+    strcpy(source, structuredInputCommand.arguements[0]);
+    strcpy(destination, structuredInputCommand.arguements[1]);
+
+    strcpy(command, "cp ");
+
+    strcat(command, source);
+    strcat(command, " ");
+    strcat(command, destination);
+    system(command);
+  }
+
+  else if(pid > 0){
+    int status;
+    wait(&status);
+  }
+
+  else{
+    printf("PROCESS CANNOT BE CREATED");
+  }
+
 }
 
 void execMoveCommand(){
+
+  pid_t pid;
+  pid = fork();
+  if(pid == 0){
+    //printf("inside fork");
+    char command[200];
+    char source[100];
+    char destination[100];
+    strcpy(source, structuredInputCommand.arguements[0]);
+    strcpy(destination, structuredInputCommand.arguements[1]);
+
+    strcpy(command, "mv ");
+
+    strcat(command, source);
+    strcat(command, " ");
+    strcat(command, destination);
+    system(command);
+  }
+
+  else if(pid > 0){
+    int status;
+    wait(&status);
+  }
+
+  else{
+    printf("PROCESS CANNOT BE CREATED");
+  }
 
 }
 
@@ -387,10 +442,6 @@ void execCommand(){
     }
   }
 
-  else if(no_of_command_tokens == 5){
-
-  }
-
   return;
 }
 
@@ -403,7 +454,7 @@ int main(int argc, char const *argv[]) {
   //printf("%s",tempInputString);
 
   while(strcmp(tempInputString, "exit") != 0){
-    if(no_of_command_tokens < 2 || no_of_command_tokens > 5){
+    if(no_of_command_tokens < 2 || no_of_command_tokens > 4){
       printf("INVALID COMMAND\n");
     }
 
@@ -417,6 +468,7 @@ int main(int argc, char const *argv[]) {
     displayCurrentDirectory();
     //printf("%p\n", inputCommandString);
     free(inputCommandString);
+    //free(tempInputString);
     //inputCommandString = NULL;
     tempInputString = getCommandInput();
   }
