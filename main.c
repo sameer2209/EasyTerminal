@@ -386,6 +386,31 @@ void execRenameCommand(){
 
 }
 
+void execOpenCommand(){
+
+  pid_t pid;
+  pid = fork();
+  if(pid == 0){
+    //printf("inside fork");
+    char command[200];
+    char filename[150];
+    strcpy(filename, structuredInputCommand.arguements[0]);
+    strcpy(command, "xdg-open ");
+    strcat(command, filename);
+    strcat(command, " &");
+    system(command);
+  }
+
+  else if(pid > 0){
+    int status;
+    wait(&status);
+  }
+
+  else{
+    printf("PROCESS CANNOT BE CREATED");
+  }
+}
+
 void execCommand(){
 
   if(no_of_command_tokens == 2){
@@ -399,6 +424,10 @@ void execCommand(){
       //printf("inside execCommand");
       puts("inside execCommand");
       execGoCommand();
+    }
+
+    else if(strcmp(structuredInputCommand.name, "open") == 0){
+      execOpenCommand();
     }
 
     else{
