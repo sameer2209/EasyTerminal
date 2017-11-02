@@ -165,7 +165,81 @@ void execShowCommand(){
   }
 }
 
+int getLastIndexOfSlash(char* currentDirectory){
+
+  int length = strlen(currentDirectory);
+  int i, lastIndexOfSlash;
+
+  for(i = length-1; i>=0; i--){
+    if(currentDirectory[i] == '/'){
+      lastIndexOfSlash = i;
+    }
+  }
+  return lastIndexOfSlash;
+}
+
 void execGoCommand(){
+
+  //printf("inside execGoCommand");
+  puts("inside execGoCommand");
+
+  if(no_of_command_tokens == 2){
+    if(strcmp(structuredInputCommand.option, "back") == 0){
+      puts("inside A");
+      char* currentDirectory;
+      currentDirectory = (char*)malloc(500*sizeof(char));
+      getcwd(currentDirectory, (size_t)500);
+      //printf("%s", currentDirectory);
+      puts(currentDirectory);
+      char* parentDirectory;
+      int lastIndexOfSlash,i;
+      lastIndexOfSlash = getLastIndexOfSlash(currentDirectory);
+      parentDirectory = (char*)malloc(200*sizeof(char));
+
+      for(i=0; i<=lastIndexOfSlash; i++){
+        parentDirectory[i] = currentDirectory[i];
+      }
+
+      chdir(parentDirectory);
+    }
+    else{
+      printf("INVALID COMMAND");
+    }
+  }
+
+  if(no_of_command_tokens == 4){
+    if(strcmp(structuredInputCommand.option, "directory") == 0){
+      chdir(structuredInputCommand.arguements[0]);
+    }
+    else{
+      printf("INVALID COMMAND");
+    }
+  }
+
+  displayCurrentDirectory();
+
+  // char command[50];
+  // if(no_of_command_tokens == 2){
+  //   strcpy(command, "cd ..");
+  //   system(command);
+  //   displayCurrentDirectory();
+  // }
+  //
+  // if(no_of_command_tokens == 4){
+  //   if(strcmp(structuredInputCommand.option, "directory") == 0 && strcmp(structuredInputCommand.option, "to") == 0){
+  //     char directoryName[100];
+  //     strcpy(directoryName, structuredInputCommand.arguements[0]);
+  //     strcpy(command, "cd ");
+  //     strcat(command, directoryName);
+  //     system(command);
+  //     displayCurrentDirectory();
+  //
+  //   }
+  //   else{
+  //     printf("INVALID COMMAND");
+  //   }
+  //
+  // }
 
 }
 void execCreateCommand(){
@@ -208,6 +282,41 @@ void execCreateCommand(){
 
 void execDeleteCommand(){
 
+  pid_t pid;
+  pid = fork();
+  if(pid == 0){
+    //printf("inside fork");
+    char command[50];
+    char filename[50];
+    strcpy(filename, structuredInputCommand.arguements[0]);
+
+
+    if(strcmp(structuredInputCommand.option, "file") == 0){
+      strcpy(command, "rm ");
+    }
+
+    else if(strcmp(structuredInputCommand.option, "folder") == 0){
+      //strcpy(command, "ls -l | grep \"^d\"");
+      strcpy(command, "rmdir ");
+    }
+
+    else{
+      printf("INVALID COMMAND");
+    }
+
+    strcat(command, filename);
+    system(command);
+  }
+
+  else if(pid > 0){
+    int status;
+    wait(&status);
+  }
+
+  else{
+    printf("PROCESS CANNOT BE CREATED");
+  }
+
 }
 
 void execCopyCommand(){
@@ -225,11 +334,15 @@ void execRenameCommand(){
 void execCommand(){
 
   if(no_of_command_tokens == 2){
+    //printf("inside block");
+    puts("inside block");
     if(strcmp(structuredInputCommand.name, "show") == 0){
       execShowCommand();
     }
 
     else if(strcmp(structuredInputCommand.name, "go") == 0){
+      //printf("inside execCommand");
+      puts("inside execCommand");
       execGoCommand();
     }
 
@@ -296,6 +409,8 @@ int main(int argc, char const *argv[]) {
 
     else{
       parseInputCommand();
+      //printf("inside else");
+      puts("inside else");
       execCommand();
     }
     //printf("%p\n", inputCommandString);
