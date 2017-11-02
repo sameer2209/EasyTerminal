@@ -148,6 +148,10 @@ void execShowCommand(){
       strcpy(command, "ls -l");
     }
 
+    else{
+      printf("INVALID COMMAND");
+    }
+
     system(command);
   }
 
@@ -166,7 +170,40 @@ void execGoCommand(){
 }
 void execCreateCommand(){
 
+  pid_t pid;
+  pid = fork();
+  if(pid == 0){
+    //printf("inside fork");
+    char command[50];
+    char filename[50];
+    strcpy(filename, structuredInputCommand.arguements[0]);
 
+
+    if(strcmp(structuredInputCommand.option, "file") == 0){
+      strcpy(command, "touch ");
+    }
+
+    else if(strcmp(structuredInputCommand.option, "folder") == 0){
+      //strcpy(command, "ls -l | grep \"^d\"");
+      strcpy(command, "mkdir ");
+    }
+
+    else{
+      printf("INVALID COMMAND");
+    }
+
+    strcat(command, filename);
+    system(command);
+  }
+
+  else if(pid > 0){
+    int status;
+    wait(&status);
+  }
+
+  else{
+    printf("PROCESS CANNOT BE CREATED");
+  }
 }
 
 void execDeleteCommand(){
