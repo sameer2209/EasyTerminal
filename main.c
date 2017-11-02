@@ -3,6 +3,9 @@
 #include "stdlib.h"
 #include "unistd.h"
 #include "errno.h"
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #define COMMAND_SIZE 200;
 
 struct Command{
@@ -18,6 +21,26 @@ char* inputCommandString; //command inputted by user
 char* commandTokensArray[5]; //maximum number of tokens is 10
 char* commandDelimiter = " "; //delimiter used to tokenize input command
 int no_of_command_tokens;
+
+char *trimwhitespace(char *str)
+{
+  char *end;
+
+  // Trim leading space
+  while(isspace((unsigned char)*str)) str++;
+
+  if(*str == 0)  // All spaces?
+    return str;
+
+  // Trim trailing space
+  end = str + strlen(str) - 1;
+  while(end > str && isspace((unsigned char)*end)) end--;
+
+  // Write new null terminator
+  *(end+1) = 0;
+
+  return str;
+}
 
 void displayCurrentDirectory(){
 
@@ -40,6 +63,8 @@ char* getCommandInput(){
   inputCommandString = (char*)malloc(200*sizeof(char));
   //scanf("%200[^\n]\n", inputCommandString);
   fgets(inputCommandString, 200, stdin);
+
+  inputCommandString = trimwhitespace(inputCommandString);
 
   tempInputString = (char*)malloc(sizeof(inputCommandString));
   strcpy(tempInputString, inputCommandString);
@@ -103,12 +128,129 @@ void parseInputCommand(){
   printf("command name: %s\ncommand option: %s\narguement: %s\narguement: %s\nhelper: %s\n", structuredInputCommand.name, structuredInputCommand.option, structuredInputCommand.arguements[0], structuredInputCommand.arguements[1], structuredInputCommand.helper);
 }
 
+void execShowCommand(){
+  //printf("hello");
+  pid_t pid;
+  pid = fork();
+  if(pid == 0){
+    //printf("inside fork");
+    char command[50];
+
+    if(strcmp(structuredInputCommand.arguements[0], "files") == 0){
+      strcpy(command, "ls -l | grep \"^-\"");
+    }
+
+    else if(strcmp(structuredInputCommand.arguements[0], "folders") == 0){
+      strcpy(command, "ls -l | grep \"^d\"");
+    }
+
+    else if(strcmp(structuredInputCommand.arguements[0], "all") == 0){
+      strcpy(command, "ls -l");
+    }
+
+    system(command);
+  }
+
+  else if(pid > 0){
+    int status;
+    wait(&status);
+  }
+
+  else{
+    printf("PROCESS CANNOT BE CREATED");
+  }
+}
+
+void execGoCommand(){
+
+}
+void execCreateCommand(){
+
+
+}
+
+void execDeleteCommand(){
+
+}
+
+void execCopyCommand(){
+
+}
+
+void execMoveCommand(){
+
+}
+
+void execRenameCommand(){
+
+}
+
+void execCommand(){
+
+  if(no_of_command_tokens == 2){
+    if(strcmp(structuredInputCommand.name, "show") == 0){
+      execShowCommand();
+    }
+
+    else if(strcmp(structuredInputCommand.name, "go") == 0){
+      execGoCommand();
+    }
+
+    else{
+      printf("COMMAND NOT SUPPORTED\n");
+      return;
+    }
+  }
+
+  else if (no_of_command_tokens == 3) {
+
+    if(strcmp(structuredInputCommand.name, "show") == 0 && strcmp(structuredInputCommand.arguements[0], "directory") == 0 && strcmp(structuredInputCommand.option, "current") == 0){
+      displayCurrentDirectory();
+    }
+
+    else if(strcmp(structuredInputCommand.name, "create") == 0){
+      execCreateCommand();
+    }
+    else if(strcmp(structuredInputCommand.name, "delete") == 0){
+      execDeleteCommand();
+    }
+    else{
+      printf("COMMAND NOT SUPPORTED\n");
+    }
+  }
+
+  else if(no_of_command_tokens == 4){
+    if(strcmp(structuredInputCommand.name, "go") == 0){
+      execGoCommand();
+    }
+    else if(strcmp(structuredInputCommand.name, "rename") == 0){
+      execRenameCommand();
+    }
+    else if(strcmp(structuredInputCommand.name, "copy") == 0){
+      execCopyCommand();
+    }
+    else if(strcmp(structuredInputCommand.name, "move") == 0){
+      execMoveCommand();
+    }
+    else{
+      printf("COMMAND NOT SUPPORTED\n");
+    }
+  }
+
+  else if(no_of_command_tokens == 5){
+
+  }
+
+  return;
+}
+
 int main(int argc, char const *argv[]) {
 
   char* tempInputString = (char*)malloc(200*sizeof(char));
   displayCurrentDirectory();
   tempInputString = getCommandInput();
-  printf("tempInputString is: %s\n", tempInputString);
+  printf("tempInputString is: %s\n",tempInputString);
+  //printf("%s",tempInputString);
 
   while(strcmp(tempInputString, "exit") != 0){
     if(no_of_command_tokens < 2 || no_of_command_tokens > 5){
@@ -117,8 +259,9 @@ int main(int argc, char const *argv[]) {
 
     else{
       parseInputCommand();
+      execCommand();
     }
-
+    //printf("%p\n", inputCommandString);
     displayCurrentDirectory();
     //printf("%p\n", inputCommandString);
     free(inputCommandString);
