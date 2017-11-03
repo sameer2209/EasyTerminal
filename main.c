@@ -6,7 +6,6 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#define COMMAND_SIZE 200;
 
 struct Command{
   char* name; //name of caommand
@@ -47,8 +46,8 @@ void displayCurrentDirectory(){
   char* currentDirectory;
   currentDirectory = (char*)malloc(200*sizeof(char));
   getcwd(currentDirectory, (size_t)200);
-  fprintf(stdout, "%s>\n", currentDirectory);
-  printf("%d\n", errno);
+  fprintf(stdout, "%s> ", currentDirectory);
+  //printf("%d\n", errno);
   //printf("%s>\t\n", currentDirectory);
 }
 
@@ -69,8 +68,8 @@ char* getCommandInput(){
   tempInputString = (char*)malloc(sizeof(inputCommandString));
   strcpy(tempInputString, inputCommandString);
 
-  printf("input String: %s\n", inputCommandString);
-  printf("temp string: %s\n", tempInputString);
+  // printf("input String: %s\n", inputCommandString);
+  // printf("temp string: %s\n", tempInputString);
   commandToken = strtok(inputCommandString, commandDelimiter);
 
   while(commandToken != NULL){
@@ -82,8 +81,8 @@ char* getCommandInput(){
     commandToken = strtok(NULL, commandDelimiter);
     i++;
   }
-  printf("no of command tokens: %d\n", no_of_command_tokens);
-  printf("input string is: %s\n", inputCommandString);
+  // printf("no of command tokens: %d\n", no_of_command_tokens);
+  // printf("input string is: %s\n", inputCommandString);
   //free(tempInputString);
   //free(inputCommandString);
   return tempInputString;
@@ -126,7 +125,7 @@ void parseInputCommand(){
     structuredInputCommand.arguements[1] = commandTokensArray[4];
   }
 
-  printf("command name: %s\ncommand option: %s\narguement: %s\narguement: %s\nhelper: %s\n", structuredInputCommand.name, structuredInputCommand.option, structuredInputCommand.arguements[0], structuredInputCommand.arguements[1], structuredInputCommand.helper);
+  // printf("command name: %s\ncommand option: %s\narguement: %s\narguement: %s\nhelper: %s\n", structuredInputCommand.name, structuredInputCommand.option, structuredInputCommand.arguements[0], structuredInputCommand.arguements[1], structuredInputCommand.helper);
 }
 
 void execShowCommand(){
@@ -150,7 +149,7 @@ void execShowCommand(){
     }
 
     else{
-      printf("INVALID COMMAND");
+      printf("INVALID COMMAND\n");
     }
 
     system(command);
@@ -162,7 +161,7 @@ void execShowCommand(){
   }
 
   else{
-    printf("PROCESS CANNOT BE CREATED");
+    printf("PROCESS CANNOT BE CREATED\n");
   }
 }
 
@@ -174,6 +173,7 @@ int getLastIndexOfSlash(char* currentDirectory){
   for(i = length-1; i>=0; i--){
     if(currentDirectory[i] == '/'){
       lastIndexOfSlash = i;
+      break;
     }
   }
   return lastIndexOfSlash;
@@ -182,16 +182,16 @@ int getLastIndexOfSlash(char* currentDirectory){
 void execGoCommand(){
 
   //printf("inside execGoCommand");
-  puts("inside execGoCommand");
+  // puts("inside execGoCommand");
 
   if(no_of_command_tokens == 2){
     if(strcmp(structuredInputCommand.option, "back") == 0){
-      puts("inside A");
+      //puts("inside A");
       char* currentDirectory;
       currentDirectory = (char*)malloc(200*sizeof(char));
       getcwd(currentDirectory, (size_t)200);
       //printf("%s", currentDirectory);
-      puts(currentDirectory);
+      //puts(currentDirectory);
       char* parentDirectory;
       int lastIndexOfSlash,i;
       lastIndexOfSlash = getLastIndexOfSlash(currentDirectory);
@@ -201,12 +201,12 @@ void execGoCommand(){
         parentDirectory[i] = currentDirectory[i];
       }
 
-      puts(parentDirectory);
+      //puts(parentDirectory);
 
       chdir(parentDirectory);
     }
     else{
-      printf("INVALID COMMAND");
+      printf("INVALID COMMAND\n");
     }
   }
 
@@ -215,35 +215,9 @@ void execGoCommand(){
       chdir(structuredInputCommand.arguements[0]);
     }
     else{
-      printf("INVALID COMMAND");
+      printf("INVALID COMMAND\n");
     }
   }
-
-  //displayCurrentDirectory();
-
-  // char command[50];
-  // if(no_of_command_tokens == 2){
-  //   strcpy(command, "cd ..");
-  //   system(command);
-  //   displayCurrentDirectory();
-  // }
-  //
-  // if(no_of_command_tokens == 4){
-  //   if(strcmp(structuredInputCommand.option, "directory") == 0 && strcmp(structuredInputCommand.option, "to") == 0){
-  //     char directoryName[100];
-  //     strcpy(directoryName, structuredInputCommand.arguements[0]);
-  //     strcpy(command, "cd ");
-  //     strcat(command, directoryName);
-  //     system(command);
-  //     displayCurrentDirectory();
-  //
-  //   }
-  //   else{
-  //     printf("INVALID COMMAND");
-  //   }
-  //
-  // }
-
 }
 void execCreateCommand(){
 
@@ -266,7 +240,7 @@ void execCreateCommand(){
     }
 
     else{
-      printf("INVALID COMMAND");
+      printf("INVALID COMMAND\n");
     }
 
     strcat(command, filename);
@@ -279,7 +253,7 @@ void execCreateCommand(){
   }
 
   else{
-    printf("PROCESS CANNOT BE CREATED");
+    printf("PROCESS CANNOT BE CREATED\n");
   }
 }
 
@@ -304,7 +278,7 @@ void execDeleteCommand(){
     }
 
     else{
-      printf("INVALID COMMAND");
+      printf("INVALID COMMAND\n");
     }
 
     strcat(command, filename);
@@ -317,7 +291,7 @@ void execDeleteCommand(){
   }
 
   else{
-    printf("PROCESS CANNOT BE CREATED");
+    printf("PROCESS CANNOT BE CREATED\n");
   }
 
 }
@@ -348,7 +322,7 @@ void execCopyCommand(){
   }
 
   else{
-    printf("PROCESS CANNOT BE CREATED");
+    printf("PROCESS CANNOT BE CREATED\n");
   }
 
 }
@@ -379,7 +353,7 @@ void execMoveCommand(){
   }
 
   else{
-    printf("PROCESS CANNOT BE CREATED");
+    printf("PROCESS CANNOT BE CREATED\n");
   }
 
 }
@@ -431,7 +405,7 @@ void execRenameCommand(){
   }
 
   else{
-    printf("PROCESS CANNOT BE CREATED");
+    printf("PROCESS CANNOT BE CREATED\n");
   }
 }
 
@@ -456,7 +430,7 @@ void execOpenCommand(){
   }
 
   else{
-    printf("PROCESS CANNOT BE CREATED");
+    printf("PROCESS CANNOT BE CREATED\n");
   }
 }
 
@@ -464,14 +438,14 @@ void execCommand(){
 
   if(no_of_command_tokens == 2){
     //printf("inside block");
-    puts("inside block");
+    //puts("inside block");
     if(strcmp(structuredInputCommand.name, "show") == 0){
       execShowCommand();
     }
 
     else if(strcmp(structuredInputCommand.name, "go") == 0){
       //printf("inside execCommand");
-      puts("inside execCommand");
+      //puts("inside execCommand");
       execGoCommand();
     }
 
@@ -528,7 +502,7 @@ int main(int argc, char const *argv[]) {
   char* tempInputString = (char*)malloc(200*sizeof(char));
   displayCurrentDirectory();
   tempInputString = getCommandInput();
-  printf("tempInputString is: %s\n",tempInputString);
+  //printf("tempInputString is: %s\n",tempInputString);
   //printf("%s",tempInputString);
 
   while(strcmp(tempInputString, "exit") != 0){
@@ -539,7 +513,7 @@ int main(int argc, char const *argv[]) {
     else{
       parseInputCommand();
       //printf("inside else");
-      puts("inside else");
+      //puts("inside else");
       execCommand();
     }
     //printf("%p\n", inputCommandString);
