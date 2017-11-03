@@ -188,8 +188,8 @@ void execGoCommand(){
     if(strcmp(structuredInputCommand.option, "back") == 0){
       puts("inside A");
       char* currentDirectory;
-      currentDirectory = (char*)malloc(500*sizeof(char));
-      getcwd(currentDirectory, (size_t)500);
+      currentDirectory = (char*)malloc(200*sizeof(char));
+      getcwd(currentDirectory, (size_t)200);
       //printf("%s", currentDirectory);
       puts(currentDirectory);
       char* parentDirectory;
@@ -200,6 +200,8 @@ void execGoCommand(){
       for(i=0; i<=lastIndexOfSlash; i++){
         parentDirectory[i] = currentDirectory[i];
       }
+
+      puts(parentDirectory);
 
       chdir(parentDirectory);
     }
@@ -384,6 +386,53 @@ void execMoveCommand(){
 
 void execRenameCommand(){
 
+  pid_t pid;
+  pid = fork();
+
+  if(pid == 0){
+    char command[200];
+    char oldname[100];
+    char newname[100];
+
+    strcpy(command, "mv ");
+    strcpy(oldname, structuredInputCommand.arguements[0]);
+
+
+    char* currentDirectory;
+    currentDirectory = (char*)malloc(500*sizeof(char));
+    getcwd(currentDirectory, (size_t)500);
+    //printf("%s", currentDirectory);
+    strcpy(newname, currentDirectory);
+    strcat(newname, "/");
+    strcat(newname, structuredInputCommand.arguements[1]);
+
+    // char* parentDirectory;
+    // int lastIndexOfSlash,i;
+    // lastIndexOfSlash = getLastIndexOfSlash(currentDirectory);
+    // parentDirectory = (char*)malloc(200*sizeof(char));
+    //
+    // for(i=0; i<=lastIndexOfSlash; i++){
+    //   parentDirectory[i] = currentDirectory[i];
+    // }
+
+    // printf("%s\n", parentDirectory);
+
+    //strcat(newname, parentDirectory);
+    strcat(command, oldname);
+    strcat(command, " ");
+    strcat(command, newname);
+
+    system(command);
+  }
+
+  else if(pid > 0){
+    int status;
+    wait(&status);
+  }
+
+  else{
+    printf("PROCESS CANNOT BE CREATED");
+  }
 }
 
 void execOpenCommand(){
